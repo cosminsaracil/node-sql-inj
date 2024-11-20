@@ -28,6 +28,14 @@ app.post("/login", (req, res) => {
   console.log("Dynamic Query:", query);
 
   db.get(query, (err, row) => {
+    // handle errors if the query fails in db run
+    if (err) {
+      console.error("Database Error:", err);
+      return res
+        .status(500)
+        .send("An error occurred while processing your request.");
+    }
+    // return the row
     if (row) {
       res.send(`Welcome, ${row.username}!`);
     } else {
@@ -42,6 +50,12 @@ app.post("/safe", (req, res) => {
   const query = `SELECT * FROM users WHERE username = ? AND password = ?`;
 
   db.get(query, [username, password], (err, row) => {
+    if (err) {
+      console.error("Database Error:", err);
+      return res
+        .status(500)
+        .send("An error occurred while processing your request.");
+    }
     if (row) {
       res.send(`Welcome, ${row.username}!`);
     } else {
@@ -65,7 +79,6 @@ app.get("/", (req, res) => {
     `);
 });
 
-// Start Server
 app.listen(3030, () => {
   console.log("Server running at http://localhost:3030/");
 });
