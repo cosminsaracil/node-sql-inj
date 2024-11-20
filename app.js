@@ -1,12 +1,13 @@
-import express from "express";
+const express = require("express");
 const sqlite3 = require("sqlite3").verbose();
-import { urlencoded } from "body-parser";
+const bodyParser = require("body-parser");
 
 const app = express();
 const db = new sqlite3.Database(":memory:"); // Use ':memory:' for in-memory database or 'example.db' for file-based.
 
 // Middleware
-app.use(urlencoded({ extended: false }));
+app.use(express.static("public"));
+app.use(bodyParser.urlencoded({ extended: false })); // Use bodyParser.urlencoded correctly
 
 // Initialize Database
 db.serialize(() => {
@@ -66,17 +67,28 @@ app.post("/safe", (req, res) => {
 
 app.get("/", (req, res) => {
   res.send(`
-        <form method="post" action="/login">
-            <label>Username: <input type="text" name="username"></label><br>
-            <label>Password: <input type="password" name="password"></label><br>
-            <button type="submit">Login (Vulnerable)</button>
-        </form>
-        <form method="post" action="/safe">
-            <label>Username: <input type="text" name="username"></label><br>
-            <label>Password: <input type="password" name="password"></label><br>
-            <button type="submit">Login (Safe)</button>
-        </form>
-    `);
+      <html>
+        <head>
+          <title>SQL Injection Demo</title>
+          <link rel="stylesheet" type="text/css" href="/styles.css">
+        </head>
+        <body>
+          <div>
+            <h2>SQL Injection Demo</h2>
+            <form method="post" action="/login">
+              <label>Username: <input type="text" name="username"></label><br>
+              <label>Password: <input type="text" name="password"></label><br>
+              <button type="submit">Login (Vulnerable)</button>
+            </form>
+            <form method="post" action="/safe">
+              <label>Username: <input type="text" name="username"></label><br>
+              <label>Password: <input type="text" name="password"></label><br>
+              <button type="submit">Login (Safe)</button>
+            </form>
+          </div>
+        </body>
+      </html>
+  `);
 });
 
 app.listen(3030, () => {
