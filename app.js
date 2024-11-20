@@ -3,13 +3,14 @@ const sqlite3 = require("sqlite3").verbose();
 const bodyParser = require("body-parser");
 
 const app = express();
-const db = new sqlite3.Database(":memory:"); // Use ':memory:' for in-memory database or 'example.db' for file-based.
+const db = new sqlite3.Database(":memory:"); // use ':memory:' for in-memory database or 'example.db' for file-based.
 
-// Middleware
+// Middleware to connect the public folder
 app.use(express.static("public"));
-app.use(bodyParser.urlencoded({ extended: false })); // Use bodyParser.urlencoded correctly
+// Middleware
+app.use(bodyParser.urlencoded({ extended: false }));
 
-// Initialize Database
+// Database initialization
 db.serialize(() => {
   db.run(`CREATE TABLE IF NOT EXISTS users (
         id INTEGER PRIMARY KEY,
@@ -29,14 +30,14 @@ app.post("/login", (req, res) => {
   console.log("Dynamic Query:", query);
 
   db.get(query, (err, row) => {
-    // handle errors if the query fails in db run
+    // Handle errors if the query fails in db run
     if (err) {
       console.error("Database Error:", err);
       return res
         .status(500)
         .send("An error occurred while processing your request.");
     }
-    // return the row
+    // Return the row
     if (row) {
       res.send(`Welcome, ${row.username}!`);
     } else {
